@@ -1,22 +1,6 @@
-# Git
-.git
-.gitignore
-
-# Python
+venv/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Local environment variables
+.git/
+.github/
 .env
-
-# IDEs
-.vscode/
-.idea/

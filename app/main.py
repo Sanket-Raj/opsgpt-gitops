@@ -1,29 +1,22 @@
-from fastapi import FastAPI, Request
+import os
+from fastapi import FastAPI
+from pydantic import BaseModel
 from transformers import pipeline
-import torch
-import time
 
 app = FastAPI()
 
-# Initialize the model (SmolLM-135M is very lightweight)
-# It will run on CPU in your local Minikube environment
-print("Loading model...")
-generator = pipeline("text-generation", model="HuggingFaceTB/SmolLM-135M", device=-1)
-print("Model loaded!")
+model_name = os.getenv("MODEL_NAME", "microsoft/phi-2")
+pipe = pipeline("text-generation", model=model_name, device_map="auto")
+
+class Query(BaseModel):
+    prompt: str
+    max_length: int = 200
+
+@app.post("/ask")
+async def ask_opsgpt(query: Query):
+    results = pipe(query.prompt, max_length=query.max_length, truncation=True)
+    return {"response": results[0]["generated_text"]}
 
 @app.get("/health")
-def health():
-    return {"status": "healthy"}
-
-@app.post("/generate")
-async def generate(data: dict):
-    prompt = data.get("prompt", "What is DevOps?")
-    start_time = time.time()
-    
-    result = generator(prompt, max_new_tokens=50, do_sample=True)
-    
-    duration = time.time() - start_time
-    return {
-        "response": result[0]['generated_text'],
-        "latency_seconds": round(duration, 4)
-    }
+async def health():
+    return {"status": "up"}
