@@ -1,48 +1,17 @@
-# OpsGPT: GitOps-Powered LLM Inference Pipeline
+# OpsGPT: GitOps-Driven MLOps Inference Engine
 
-**OpsGPT** is an end-to-end DevOps project that demonstrates the deployment of a lightweight Large Language Model (LLM) using modern GitOps principles. It serves a Hugging Face model via a FastAPI interface, containerized with Docker, and deployed to Kubernetes using ArgoCD for continuous delivery.
+OpsGPT is a production-grade inference engine designed to serve Hugging Face LLMs (DistilGPT-2/SmolLM) with high availability and automated delivery. 
 
-## 🚀 Project Overview
+I built this project to demonstrate a **Split-Repository GitOps Strategy**, separating application source code from configuration manifests to ensure security, auditability, and clean release cycles.
 
-The goal of this project was to build a robust "Machine Learning Operations" (MLOps) workflow that bridges the gap between application development and Kubernetes operations.
+## 🏗 Architecture
 
-It utilizes a **Split-Repository Strategy** to separate application source code from infrastructure manifests:
-* **Application Repo:** Contains the FastAPI code, model inference logic, and Dockerfile.
-* **GitOps Repo:** Contains the Kubernetes manifests (Helm/Kustomize) monitored by ArgoCD.
-
-## 🛠️ Tech Stack
-
-* **Language:** Python 3.9+
-* **Framework:** FastAPI (for serving the API)
-* **AI/ML:** Hugging Face `transformers` (Model: `SmolLM-135M` / `distilgpt2`)
-* **Containerization:** Docker
-* **Orchestration:** Kubernetes (K8s)
-* **CI/CD:** GitHub Actions (CI) + ArgoCD (CD)
-* **Version Control:** Git
-
-## 🏗️ Architecture
-
-The pipeline follows this workflow:
-1.  **Code Push:** Code changes are pushed to the main branch of this repository.
-2.  **CI Pipeline:** GitHub Actions builds the Docker image and pushes it to Docker Hub/GHCR.
-3.  **Manifest Update:** The CI pipeline automatically updates the image tag in the separate *GitOps repository*.
-4.  **Sync:** ArgoCD detects the change in the GitOps repo and syncs the Kubernetes cluster to the new state.
-
-## ⚙️ Installation & Local Run
-
-To run the inference API locally without Kubernetes:
-
-```bash
-# Clone the repository
-git clone [https://github.com/YOUR_USERNAME/opsgpt-app.git](https://github.com/YOUR_USERNAME/opsgpt-app.git)
-cd opsgpt-app
-
-# Create a virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the server
-uvicorn main:app --reload
+```mermaid
+graph LR
+    A[Developer] -->|Push Code| B(opsgpt-app Repo)
+    B -->|GitHub Action| C{CI Pipeline}
+    C -->|Build & Test| D[Docker Registry]
+    C -->|Update Tag| E(opsgpt-gitops Repo)
+    E -->|Sync| F[ArgoCD]
+    F -->|Deploy| G[Kubernetes Cluster]
+    G -->|Scale| H[HPA]
